@@ -7,6 +7,12 @@ import type { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '~/server/prisma';
+import EventEmitter, { on } from 'events';
+import { sse } from '@trpc/server';
+import { Post } from '@prisma/client';
+
+// In a real app, you'd probably use Redis or something
+const ee = new EventEmitter();
 
 /**
  * Default selector for Post.
@@ -57,7 +63,6 @@ export const postRouter = router({
       if (items.length > limit) {
         // Remove the last item and use it as next cursor
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const nextItem = items.pop()!;
         nextCursor = nextItem.id;
       }
@@ -100,6 +105,22 @@ export const postRouter = router({
         data: input,
         select: defaultPostSelect,
       });
+
+      ee.emit('add', post);
       return post;
     }),
+
+  // HTTP Subscription Link
+  // https://trpc.io/docs/client/links/httpSubscriptionLink
+  onPostAdd: publicProcedure.subscription(async function* () {
+    // listen for new events
+    for await (const [data] of on(ee, 'add')) {
+      const post = data as Post;
+      yield sse({
+        // yielding the post id ensures the client can reconnect at any time and get the latest events this id
+        id: post.id,
+        data: post,
+      });
+    }
+  }),
 });

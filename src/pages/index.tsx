@@ -2,7 +2,7 @@ import { trpc } from '../utils/trpc';
 import type { NextPageWithLayout } from './_app';
 import type { inferProcedureInput } from '@trpc/server';
 import Link from 'next/link';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import type { AppRouter } from '~/server/routers/_app';
 
 const IndexPage: NextPageWithLayout = () => {
@@ -19,6 +19,14 @@ const IndexPage: NextPageWithLayout = () => {
   );
 
   const iterable = trpc.examples.iterable.useQuery();
+
+  const [posts, setPosts] = useState<any>(null);
+  trpc.post.onPostAdd.useSubscription(undefined, {
+    onData(data) {
+      setPosts(data);
+    },
+  });
+  console.log({ posts });
 
   const addPost = trpc.post.add.useMutation({
     async onSuccess() {

@@ -1,4 +1,9 @@
-import { unstable_httpBatchStreamLink, loggerLink } from '@trpc/client';
+import {
+  unstable_httpBatchStreamLink,
+  unstable_httpSubscriptionLink,
+  loggerLink,
+  splitLink,
+} from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
 
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
@@ -62,30 +67,38 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
             process.env.NODE_ENV === 'development' ||
             (opts.direction === 'down' && opts.result instanceof Error),
         }),
-        unstable_httpBatchStreamLink({
-          url: `${getBaseUrl()}/api/trpc`,
-          /**
-           * Set custom request headers on every request from tRPC
-           * @link https://trpc.io/docs/v11/ssr
-           */
-          headers() {
-            if (!ctx?.req?.headers) {
-              return {};
-            }
-            // To use SSR properly, you need to forward the client's headers to the server
-            // This is so you can pass through things like cookies when we're server-side rendering
+        splitLink({
+          // uses the httpSubscriptionLink for subscriptions
+          condition: (op) => op.type === 'subscription',
+          true: unstable_httpSubscriptionLink({
+            url: `/api/trpc`,
+            transformer,
+          }),
+          false: unstable_httpBatchStreamLink({
+            url: `${getBaseUrl()}/api/trpc`,
+            /**
+             * Set custom request headers on every request from tRPC
+             * @link https://trpc.io/docs/v11/ssr
+             */
+            headers() {
+              if (!ctx?.req?.headers) {
+                return {};
+              }
+              // To use SSR properly, you need to forward the client's headers to the server
+              // This is so you can pass through things like cookies when we're server-side rendering
 
-            const {
-              // If you're using Node 18 before 18.15.0, omit the "connection" header
-              // connection: _connection,
-              ...headers
-            } = ctx.req.headers;
-            return headers;
-          },
-          /**
-           * @link https://trpc.io/docs/v11/data-transformers
-           */
-          transformer,
+              const {
+                // If you're using Node 18 before 18.15.0, omit the "connection" header
+                // connection: _connection,
+                ...headers
+              } = ctx.req.headers;
+              return headers;
+            },
+            /**
+             * @link https://trpc.io/docs/v11/data-transformers
+             */
+            transformer,
+          }),
         }),
       ],
       /**

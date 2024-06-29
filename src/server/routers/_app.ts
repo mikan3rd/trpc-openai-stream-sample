@@ -10,8 +10,10 @@ export const appRouter = router({
   post: postRouter,
 
   examples: {
+    // HTTP Batch Stream Link
+    // https://trpc.io/docs/client/links/httpBatchStreamLink
     iterable: publicProcedure.query(async function* () {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 10; i++) {
         await new Promise((resolve) => setTimeout(resolve, 500));
         yield i;
       }
