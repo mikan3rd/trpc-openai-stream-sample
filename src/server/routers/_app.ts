@@ -8,6 +8,15 @@ export const appRouter = router({
   healthcheck: publicProcedure.query(() => 'yay!'),
 
   post: postRouter,
+
+  examples: {
+    iterable: publicProcedure.query(async function* () {
+      for (let i = 0; i < 3; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        yield i;
+      }
+    }),
+  },
 });
 
 export const createCaller = createCallerFactory(appRouter);

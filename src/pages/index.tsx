@@ -18,6 +18,9 @@ const IndexPage: NextPageWithLayout = () => {
     },
   );
 
+  const iterable = trpc.examples.iterable.useQuery();
+  console.log(iterable.data);
+
   const addPost = trpc.post.add.useMutation({
     async onSuccess() {
       // refetches posts after a post is added
@@ -58,6 +61,14 @@ const IndexPage: NextPageWithLayout = () => {
       </p>
 
       <div className="flex flex-col py-8 items-start gap-y-2">
+        <h2 className="text-3xl font-semibold">Iterable</h2>
+        <div>status={iterable.status}</div>
+        <div>isLoading={`${iterable.isLoading}`}</div>
+        <div>isFetching={`${iterable.isFetching}`}</div>
+        <div>data={iterable.data}</div>
+      </div>
+
+      <div className="flex flex-col py-8 items-start gap-y-2">
         <div className="flex flex-col"></div>
         <h2 className="text-3xl font-semibold">
           Latest Posts
@@ -77,7 +88,7 @@ const IndexPage: NextPageWithLayout = () => {
         </button>
 
         {postsQuery.data?.pages.map((page, index) => (
-          <Fragment key={page.items[0]?.id || index}>
+          <Fragment key={page.items[0]?.id ?? index}>
             {page.items.map((item) => (
               <article key={item.id}>
                 <h3 className="text-2xl font-semibold">{item.title}</h3>
