@@ -19,7 +19,6 @@ const IndexPage: NextPageWithLayout = () => {
   );
 
   const iterable = trpc.examples.iterable.useQuery();
-  console.log(iterable.data);
 
   const addPost = trpc.post.add.useMutation({
     async onSuccess() {
