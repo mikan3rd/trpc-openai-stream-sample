@@ -47,11 +47,6 @@ export const appRouter = router({
           const targetIndex = 0;
           const target = chunk.choices[targetIndex];
           const content = target?.delta?.content ?? '';
-
-          if (target?.index === undefined) {
-            throw new Error('missing index');
-          }
-
           yield content;
         }
       }),
