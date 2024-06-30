@@ -50,6 +50,32 @@ export const appRouter = router({
           yield content;
         }
       }),
+
+    openai2: publicProcedure
+      .input(
+        z.object({
+          text: z.string().min(1),
+        }),
+      )
+      .mutation(async function* ({ input }) {
+        const stream = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'user',
+              content: input.text,
+            },
+          ],
+          stream: true,
+        });
+
+        for await (const chunk of stream) {
+          const targetIndex = 0;
+          const target = chunk.choices[targetIndex];
+          const content = target?.delta?.content ?? '';
+          yield content;
+        }
+      }),
   },
 
   openai: {

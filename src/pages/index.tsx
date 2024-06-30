@@ -19,22 +19,33 @@ const IndexPage: NextPageWithLayout = () => {
     },
   );
 
-  const iterable = trpc.examples.iterable.useQuery();
+  // const iterable = trpc.examples.iterable.useQuery();
 
   const [inputText, setInputText] = useState<string>(
     'ChatGPT-4の特徴を簡潔に説明してください',
   );
   const openai = trpc.examples.openai.useQuery(
-    {
-      text: inputText,
-    },
+    { text: inputText },
     {
       enabled: false,
       placeholderData: keepPreviousData,
     },
   );
+
+  const [text, setText] = useState<string>('');
+  const openai2 = trpc.examples.openai2.useMutation();
   const submitText = async () => {
-    await openai.refetch();
+    openai2.mutate(
+      { text: inputText },
+      {
+        onSuccess: async (data) => {
+          for await (const val of data) {
+            setText((prev) => prev + val);
+          }
+        },
+      },
+    );
+    // await openai.refetch();
   };
 
   // const [posts, setPosts] = useState<any>(null);
@@ -114,10 +125,10 @@ const IndexPage: NextPageWithLayout = () => {
           </div>
         </form>
 
-        <p className="py-4 break-all">{openai.data}</p>
+        <p className="py-4 break-all">{text}</p>
       </div>
 
-      <hr />
+      {/* <hr />
 
       <div className="flex flex-col py-8 items-start gap-y-2">
         <h2 className="text-3xl font-semibold">Iterable</h2>
@@ -125,7 +136,7 @@ const IndexPage: NextPageWithLayout = () => {
         <div>isLoading={`${iterable.isLoading}`}</div>
         <div>isFetching={`${iterable.isFetching}`}</div>
         <div>data={iterable.data}</div>
-      </div>
+      </div> */}
 
       <hr />
 
