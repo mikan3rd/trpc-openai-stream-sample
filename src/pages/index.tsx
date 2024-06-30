@@ -23,11 +23,16 @@ const IndexPage: NextPageWithLayout = () => {
   const [inputText, setInputText] = useState<string>(
     'ChatGPT-4の特徴を簡潔に説明してください',
   );
-  const openai = trpc.examples.openai.useQuery({
-    text: inputText,
-  });
+  const openai = trpc.examples.openai.useQuery(
+    {
+      text: inputText,
+    },
+    {
+      enabled: false,
+    },
+  );
   const submitText = async () => {
-    // openai.mutate({ text: inputText });
+    await openai.refetch();
   };
 
   // const [posts, setPosts] = useState<any>(null);
@@ -87,7 +92,7 @@ const IndexPage: NextPageWithLayout = () => {
               rows={10}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              disabled={openai.isPending}
+              disabled={openai.isFetching}
             />
 
             <div className="flex justify-center">
@@ -98,7 +103,7 @@ const IndexPage: NextPageWithLayout = () => {
                   e.preventDefault();
                   submitText();
                 }}
-                disabled={openai.isPending}
+                disabled={openai.isFetching}
               />
               {addPost.error && (
                 <p style={{ color: 'red' }}>{openai.error?.message}</p>
