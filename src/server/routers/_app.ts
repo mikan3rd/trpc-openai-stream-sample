@@ -44,12 +44,17 @@ export const appRouter = router({
           stream: true,
         });
 
+        let fullContent = '';
         for await (const chunk of stream) {
           const targetIndex = 0;
           const target = chunk.choices[targetIndex];
           const content = target?.delta?.content ?? '';
           yield content;
+
+          fullContent += content;
         }
+
+        console.log({ fullContent });
       }),
 
     openai2: publicProcedure
