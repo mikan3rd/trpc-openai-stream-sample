@@ -20,13 +20,23 @@ const IndexPage: NextPageWithLayout = () => {
 
   const iterable = trpc.examples.iterable.useQuery();
 
-  const [posts, setPosts] = useState<any>(null);
-  trpc.post.onPostAdd.useSubscription(undefined, {
-    onData(data) {
-      setPosts(data);
-    },
+  const [inputText, setInputText] = useState<string>(
+    'ChatGPT-4の特徴を簡潔に説明してください',
+  );
+  const openai = trpc.examples.openai.useQuery({
+    text: inputText,
   });
-  console.log({ posts });
+  const submitText = async () => {
+    // openai.mutate({ text: inputText });
+  };
+
+  // const [posts, setPosts] = useState<any>(null);
+  // trpc.post.onPostAdd.useSubscription(undefined, {
+  //   onData(data) {
+  //     setPosts(data);
+  //   },
+  // });
+  // console.log({ posts });
 
   const addPost = trpc.post.add.useMutation({
     async onSuccess() {
@@ -67,6 +77,41 @@ const IndexPage: NextPageWithLayout = () => {
         .
       </p>
 
+      <div className="flex flex-col py-8 items-center">
+        <h2 className="text-3xl font-semibold">OpenAI</h2>
+
+        <form className="py-2 w-4/6">
+          <div className="flex flex-col gap-y-4 font-semibold">
+            <textarea
+              className="resize-none focus-visible:outline-dashed outline-offset-4 outline-2 outline-gray-700 rounded-xl px-4 py-3 bg-gray-900"
+              rows={10}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={openai.isPending}
+            />
+
+            <div className="flex justify-center">
+              <input
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  submitText();
+                }}
+                disabled={openai.isPending}
+              />
+              {addPost.error && (
+                <p style={{ color: 'red' }}>{openai.error?.message}</p>
+              )}
+            </div>
+          </div>
+        </form>
+
+        <p className="py-4 break-all">{openai.data}</p>
+      </div>
+
+      <hr />
+
       <div className="flex flex-col py-8 items-start gap-y-2">
         <h2 className="text-3xl font-semibold">Iterable</h2>
         <div>status={iterable.status}</div>
@@ -74,6 +119,8 @@ const IndexPage: NextPageWithLayout = () => {
         <div>isFetching={`${iterable.isFetching}`}</div>
         <div>data={iterable.data}</div>
       </div>
+
+      <hr />
 
       <div className="flex flex-col py-8 items-start gap-y-2">
         <div className="flex flex-col"></div>
