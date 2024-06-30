@@ -4,6 +4,7 @@ import type { inferProcedureInput } from '@trpc/server';
 import Link from 'next/link';
 import { Fragment, useState } from 'react';
 import type { AppRouter } from '~/server/routers/_app';
+import { keepPreviousData } from '@tanstack/react-query';
 
 const IndexPage: NextPageWithLayout = () => {
   const utils = trpc.useUtils();
@@ -29,6 +30,7 @@ const IndexPage: NextPageWithLayout = () => {
     },
     {
       enabled: false,
+      placeholderData: keepPreviousData,
     },
   );
   const submitText = async () => {
