@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
+// https://docs.anthropic.com/en/api/messages-streaming
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });

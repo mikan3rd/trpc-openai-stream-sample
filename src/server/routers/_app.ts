@@ -5,7 +5,7 @@ import { createCallerFactory, publicProcedure, router } from '../trpc';
 import { z } from 'zod';
 import { chatCompletionsStream } from '../functions/openai';
 import { iterablePromise } from '../functions/iterable';
-import { chatOpenAI } from '../functions/langchain';
+import { chatLangChain } from '../functions/langchain';
 import { messageCreateStream } from '../functions/anthropicAI';
 
 export const appRouter = router({
@@ -68,7 +68,7 @@ export const appRouter = router({
         }),
       )
       .query(async function* ({ input }) {
-        yield* chatOpenAI(input.text);
+        yield* chatLangChain({ modelType: 'openai', text: input.text });
       }),
 
     openai2: publicProcedure
@@ -78,7 +78,27 @@ export const appRouter = router({
         }),
       )
       .mutation(async function* ({ input }) {
-        yield* chatOpenAI(input.text);
+        yield* chatLangChain({ modelType: 'openai', text: input.text });
+      }),
+
+    anthropic: publicProcedure
+      .input(
+        z.object({
+          text: z.string().min(1),
+        }),
+      )
+      .query(async function* ({ input }) {
+        yield* chatLangChain({ modelType: 'anthropic', text: input.text });
+      }),
+
+    anthropic2: publicProcedure
+      .input(
+        z.object({
+          text: z.string().min(1),
+        }),
+      )
+      .mutation(async function* ({ input }) {
+        yield* chatLangChain({ modelType: 'anthropic', text: input.text });
       }),
   },
 });

@@ -94,6 +94,34 @@ const IndexPage: NextPageWithLayout = () => {
     );
   };
 
+  const langchainAnthropic = trpc.langchain.anthropic.useQuery(
+    { text: inputText },
+    {
+      enabled: false,
+      placeholderData: keepPreviousData,
+    },
+  );
+  const submitByQueryLangchainAnthropic = async () => {
+    await langchainAnthropic.refetch();
+  };
+
+  const [langchainAnthropicText, setLangchainAnthropicText] =
+    useState<string>('');
+  const langchainAnthropic2 = trpc.langchain.anthropic2.useMutation();
+  const submitByMutationLangchainAnthropic = async () => {
+    langchainAnthropic2.mutate(
+      { text: inputText },
+      {
+        onSuccess: async (data) => {
+          setLangchainAnthropicText('');
+          for await (const val of data) {
+            setLangchainAnthropicText((prev) => prev + val);
+          }
+        },
+      },
+    );
+  };
+
   return (
     <div className="flex flex-col bg-gray-800 py-8">
       <h1 className="text-4xl font-bold">
@@ -163,7 +191,7 @@ const IndexPage: NextPageWithLayout = () => {
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
                 type="button"
                 onClick={submitByMutationAnthropic}
-                disabled={openai2.isPending}
+                disabled={anthropic2.isPending}
               >
                 mutation
               </button>
@@ -192,7 +220,7 @@ const IndexPage: NextPageWithLayout = () => {
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
                 type="button"
                 onClick={submitByQueryLangchain}
-                disabled={openai.isFetching}
+                disabled={langchainOpenai.isFetching}
               >
                 query
               </button>
@@ -201,7 +229,7 @@ const IndexPage: NextPageWithLayout = () => {
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
                 type="button"
                 onClick={submitByMutationLangchain}
-                disabled={openai2.isPending}
+                disabled={langchainOpenai2.isPending}
               >
                 mutation
               </button>
@@ -219,6 +247,48 @@ const IndexPage: NextPageWithLayout = () => {
             </p>
             <p className="py-4 break-all whitespace-pre-wrap">
               {langchainOpenaiText}
+            </p>
+
+            <hr />
+
+            <div className="flex justify-center items-center gap-8">
+              <h3 className="text-2xl font-semibold">
+                LangChain Anthropic (Claude)
+              </h3>
+
+              <button
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="button"
+                onClick={submitByQueryLangchainAnthropic}
+                disabled={langchainAnthropic.isFetching}
+              >
+                query
+              </button>
+
+              <button
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="button"
+                onClick={submitByMutationLangchainAnthropic}
+                disabled={langchainAnthropic2.isPending}
+              >
+                mutation
+              </button>
+            </div>
+
+            {langchainAnthropic.error && (
+              <p style={{ color: 'red' }}>{langchainAnthropic.error.message}</p>
+            )}
+            {langchainAnthropic2.error && (
+              <p style={{ color: 'red' }}>
+                {langchainAnthropic2.error.message}
+              </p>
+            )}
+
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {langchainAnthropic.data}
+            </p>
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {langchainAnthropicText}
             </p>
           </div>
         </form>

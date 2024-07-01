@@ -32,6 +32,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.2",
+    "@langchain/anthropic": "^0.2.3",
+    "@langchain/core": "^0.2.11",
     "@langchain/openai": "^0.2.1",
     "@prisma/client": "^5.12.1",
     "@tanstack/react-query": "^5.45.0",

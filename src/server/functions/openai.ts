@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 
+// https://platform.openai.com/docs/api-reference/streaming
 const openai = new OpenAI({
   apiKey: process.env.OPEN_AI_API_KEY,
 });

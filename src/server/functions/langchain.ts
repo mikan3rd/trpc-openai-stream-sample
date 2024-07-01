@@ -1,12 +1,36 @@
 import { ChatOpenAI } from '@langchain/openai';
+import { ChatAnthropic } from '@langchain/anthropic';
 
-const chat = new ChatOpenAI({
-  model: 'gpt-3.5-turbo',
+// https://js.langchain.com/v0.2/docs/how_to/streaming/
+const chatOpenAI = new ChatOpenAI({
   apiKey: process.env.OPEN_AI_API_KEY,
+  model: 'gpt-3.5-turbo',
 });
 
-export const chatOpenAI = async function* (text: string) {
-  const stream = await chat.stream([['user', text]]);
+const chatAnthropic = new ChatAnthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  model: 'claude-3-haiku-20240307',
+});
+
+export const chatLangChain = async function* (args: {
+  modelType: 'openai' | 'anthropic';
+  text: string;
+}) {
+  const { modelType, text } = args;
+
+  const model = (() => {
+    switch (modelType) {
+      case 'openai':
+        return chatOpenAI;
+      case 'anthropic':
+        return chatAnthropic;
+      default:
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        throw new Error(`Unknown modelType: ${modelType}`);
+    }
+  })();
+
+  const stream = await model.stream([['user', text]]);
 
   let fullContent = '';
   for await (const chunk of stream) {
