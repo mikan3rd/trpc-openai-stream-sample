@@ -8,7 +8,7 @@ export const messageCreateStream = async function* (text: string) {
   const stream = await anthropic.messages.create({
     max_tokens: 1024,
     messages: [{ role: 'user', content: text }],
-    model: 'claude-3-opus-20240229',
+    model: 'claude-3-haiku-20240307',
     stream: true,
   });
 
