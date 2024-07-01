@@ -11,7 +11,7 @@ const IndexPage: NextPageWithLayout = () => {
   // const iterable2 = trpc.examples.iterable2.useMutation();
 
   const [inputText, setInputText] = useState<string>(
-    'ChatGPT-4の特徴を簡潔に説明してください',
+    'ChatGPTとClaudeを比較してください',
   );
 
   const openai = trpc.examples.openai.useQuery(
@@ -45,28 +45,8 @@ const IndexPage: NextPageWithLayout = () => {
       <h1 className="text-4xl font-bold">
         Welcome to your tRPC with OpenAI stream!
       </h1>
-      <p className="text-gray-400">
-        If you get stuck, check{' '}
-        <Link className="underline" href="https://trpc.io">
-          the docs
-        </Link>
-        , write a message in our{' '}
-        <Link className="underline" href="https://trpc.io/discord">
-          Discord-channel
-        </Link>
-        , or write a message in{' '}
-        <Link
-          className="underline"
-          href="https://github.com/trpc/trpc/discussions"
-        >
-          GitHub Discussions
-        </Link>
-        .
-      </p>
 
       <div className="flex flex-col py-8 items-center">
-        <h2 className="text-3xl font-semibold">OpenAI</h2>
-
         <form className="py-2 w-4/6">
           <div className="flex flex-col gap-y-4 font-semibold">
             <textarea
@@ -77,7 +57,9 @@ const IndexPage: NextPageWithLayout = () => {
               disabled={openai.isFetching}
             />
 
-            <div className="flex justify-center">
+            <div className="flex justify-center items-center gap-8">
+              <h3 className="text-2xl font-semibold">OpenAI</h3>
+
               <button
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
                 type="submit"
@@ -108,11 +90,11 @@ const IndexPage: NextPageWithLayout = () => {
                 <p style={{ color: 'red' }}>{openai2.error.message}</p>
               )}
             </div>
+
+            <p className="py-4 break-all whitespace-pre-wrap">{openai.data}</p>
+            <p className="py-4 break-all whitespace-pre-wrap">{text}</p>
           </div>
         </form>
-
-        <p className="py-4 break-all">{openai.data}</p>
-        <p className="py-4 break-all">{text}</p>
       </div>
     </div>
   );
