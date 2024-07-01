@@ -3,11 +3,7 @@
  */
 import { createCallerFactory, publicProcedure, router } from '../trpc';
 import { z } from 'zod';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
-});
+import { chatCompletionsStream } from '../functions/openai';
 
 export const appRouter = router({
   examples: {
@@ -33,28 +29,7 @@ export const appRouter = router({
         }),
       )
       .query(async function* ({ input }) {
-        const stream = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: input.text,
-            },
-          ],
-          stream: true,
-        });
-
-        let fullContent = '';
-        for await (const chunk of stream) {
-          const targetIndex = 0;
-          const target = chunk.choices[targetIndex];
-          const content = target?.delta?.content ?? '';
-          yield content;
-
-          fullContent += content;
-        }
-
-        console.log({ fullContent });
+        yield* chatCompletionsStream(input.text);
       }),
 
     openai2: publicProcedure
@@ -64,23 +39,7 @@ export const appRouter = router({
         }),
       )
       .mutation(async function* ({ input }) {
-        const stream = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: input.text,
-            },
-          ],
-          stream: true,
-        });
-
-        for await (const chunk of stream) {
-          const targetIndex = 0;
-          const target = chunk.choices[targetIndex];
-          const content = target?.delta?.content ?? '';
-          yield content;
-        }
+        yield* chatCompletionsStream(input.text);
       }),
   },
 });
