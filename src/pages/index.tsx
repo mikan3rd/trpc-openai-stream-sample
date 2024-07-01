@@ -1,6 +1,5 @@
 import { trpc } from '../utils/trpc';
 import type { NextPageWithLayout } from './_app';
-import Link from 'next/link';
 import { useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 
@@ -62,34 +61,29 @@ const IndexPage: NextPageWithLayout = () => {
 
               <button
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  submitByQuery();
-                }}
+                type="button"
+                onClick={submitByQuery}
                 disabled={openai.isFetching}
               >
                 query
               </button>
-              {openai.error && (
-                <p style={{ color: 'red' }}>{openai.error.message}</p>
-              )}
 
               <button
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  submitByMutation();
-                }}
+                type="button"
+                onClick={submitByMutation}
                 disabled={openai2.isPending}
               >
                 mutation
               </button>
-              {openai2.error && (
-                <p style={{ color: 'red' }}>{openai2.error.message}</p>
-              )}
             </div>
+
+            {openai.error && (
+              <p style={{ color: 'red' }}>{openai.error.message}</p>
+            )}
+            {openai2.error && (
+              <p style={{ color: 'red' }}>{openai2.error.message}</p>
+            )}
 
             <p className="py-4 break-all whitespace-pre-wrap">{openai.data}</p>
             <p className="py-4 break-all whitespace-pre-wrap">{text}</p>
