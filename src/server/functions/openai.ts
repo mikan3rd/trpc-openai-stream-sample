@@ -4,13 +4,13 @@ const openai = new OpenAI({
   apiKey: process.env.OPEN_AI_API_KEY,
 });
 
-export const chatCompletionsStream = async function* (content: string) {
+export const chatCompletionsStream = async function* (text: string) {
   const stream = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     messages: [
       {
         role: 'user',
-        content,
+        content: text,
       },
     ],
     stream: true,

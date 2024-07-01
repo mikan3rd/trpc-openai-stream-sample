@@ -10,7 +10,7 @@ const IndexPage: NextPageWithLayout = () => {
   // const iterable2 = trpc.examples.iterable2.useMutation();
 
   const [inputText, setInputText] = useState<string>(
-    'ChatGPTとClaudeを比較してください',
+    'ChatGPT、Claude、LangChainについて説明してください',
   );
 
   const openai = trpc.examples.openai.useQuery(
@@ -31,8 +31,36 @@ const IndexPage: NextPageWithLayout = () => {
       { text: inputText },
       {
         onSuccess: async (data) => {
+          setText('');
           for await (const val of data) {
             setText((prev) => prev + val);
+          }
+        },
+      },
+    );
+  };
+
+  const langchainOpenai = trpc.langchain.openai.useQuery(
+    { text: inputText },
+    {
+      enabled: false,
+      placeholderData: keepPreviousData,
+    },
+  );
+  const submitByQueryLangchain = async () => {
+    langchainOpenai.refetch();
+  };
+
+  const [langchainOpenaiText, setLangchainOpenaiText] = useState<string>('');
+  const langchainOpenai2 = trpc.langchain.openai2.useMutation();
+  const submitByMutationLangchain = async () => {
+    langchainOpenai2.mutate(
+      { text: inputText },
+      {
+        onSuccess: async (data) => {
+          setLangchainOpenaiText('');
+          for await (const val of data) {
+            setLangchainOpenaiText((prev) => prev + val);
           }
         },
       },
@@ -87,6 +115,42 @@ const IndexPage: NextPageWithLayout = () => {
 
             <p className="py-4 break-all whitespace-pre-wrap">{openai.data}</p>
             <p className="py-4 break-all whitespace-pre-wrap">{text}</p>
+
+            <div className="flex justify-center items-center gap-8">
+              <h3 className="text-2xl font-semibold">LangChain OpenAI</h3>
+
+              <button
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="button"
+                onClick={submitByQueryLangchain}
+                disabled={openai.isFetching}
+              >
+                query
+              </button>
+
+              <button
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="button"
+                onClick={submitByMutationLangchain}
+                disabled={openai2.isPending}
+              >
+                mutation
+              </button>
+            </div>
+
+            {langchainOpenai.error && (
+              <p style={{ color: 'red' }}>{langchainOpenai.error.message}</p>
+            )}
+            {openai2.error && (
+              <p style={{ color: 'red' }}>{openai2.error.message}</p>
+            )}
+
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {langchainOpenai.data}
+            </p>
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {langchainOpenaiText}
+            </p>
           </div>
         </form>
       </div>
