@@ -10,7 +10,7 @@ const IndexPage: NextPageWithLayout = () => {
   // const iterable2 = trpc.examples.iterable2.useMutation();
 
   const [inputText, setInputText] = useState<string>(
-    'ChatGPT、Claude、LangChainについて説明してください',
+    'ChatGPT、Claude、LangChainについて簡潔に説明してください',
   );
 
   const openai = trpc.examples.openai.useQuery(
@@ -21,7 +21,7 @@ const IndexPage: NextPageWithLayout = () => {
     },
   );
   const submitByQuery = async () => {
-    openai.refetch();
+    await openai.refetch();
   };
 
   const [text, setText] = useState<string>('');
@@ -40,6 +40,33 @@ const IndexPage: NextPageWithLayout = () => {
     );
   };
 
+  const anthropic = trpc.examples.anthropic.useQuery(
+    { text: inputText },
+    {
+      enabled: false,
+      placeholderData: keepPreviousData,
+    },
+  );
+  const submitByQueryAnthropic = async () => {
+    await anthropic.refetch();
+  };
+
+  const [anthropicText, setAnthropicText] = useState<string>('');
+  const anthropic2 = trpc.examples.anthropic2.useMutation();
+  const submitByMutationAnthropic = async () => {
+    anthropic2.mutate(
+      { text: inputText },
+      {
+        onSuccess: async (data) => {
+          setAnthropicText('');
+          for await (const val of data) {
+            setAnthropicText((prev) => prev + val);
+          }
+        },
+      },
+    );
+  };
+
   const langchainOpenai = trpc.langchain.openai.useQuery(
     { text: inputText },
     {
@@ -48,7 +75,7 @@ const IndexPage: NextPageWithLayout = () => {
     },
   );
   const submitByQueryLangchain = async () => {
-    langchainOpenai.refetch();
+    await langchainOpenai.refetch();
   };
 
   const [langchainOpenaiText, setLangchainOpenaiText] = useState<string>('');
@@ -84,8 +111,10 @@ const IndexPage: NextPageWithLayout = () => {
               disabled={openai.isFetching}
             />
 
+            <hr />
+
             <div className="flex justify-center items-center gap-8">
-              <h3 className="text-2xl font-semibold">OpenAI</h3>
+              <h3 className="text-2xl font-semibold">OpenAI (GPT)</h3>
 
               <button
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
@@ -116,8 +145,48 @@ const IndexPage: NextPageWithLayout = () => {
             <p className="py-4 break-all whitespace-pre-wrap">{openai.data}</p>
             <p className="py-4 break-all whitespace-pre-wrap">{text}</p>
 
+            <hr />
+
             <div className="flex justify-center items-center gap-8">
-              <h3 className="text-2xl font-semibold">LangChain OpenAI</h3>
+              <h3 className="text-2xl font-semibold">Anthropic (Claude)</h3>
+
+              <button
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="button"
+                onClick={submitByQueryAnthropic}
+                disabled={anthropic.isFetching}
+              >
+                query
+              </button>
+
+              <button
+                className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
+                type="button"
+                onClick={submitByMutationAnthropic}
+                disabled={openai2.isPending}
+              >
+                mutation
+              </button>
+            </div>
+
+            {anthropic.error && (
+              <p style={{ color: 'red' }}>{anthropic.error.message}</p>
+            )}
+            {anthropic2.error && (
+              <p style={{ color: 'red' }}>{anthropic2.error.message}</p>
+            )}
+
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {anthropic.data}
+            </p>
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {anthropicText}
+            </p>
+
+            <hr />
+
+            <div className="flex justify-center items-center gap-8">
+              <h3 className="text-2xl font-semibold">LangChain OpenAI (GPT)</h3>
 
               <button
                 className="cursor-pointer bg-gray-900 p-2 rounded-md px-16"
@@ -141,8 +210,8 @@ const IndexPage: NextPageWithLayout = () => {
             {langchainOpenai.error && (
               <p style={{ color: 'red' }}>{langchainOpenai.error.message}</p>
             )}
-            {openai2.error && (
-              <p style={{ color: 'red' }}>{openai2.error.message}</p>
+            {langchainOpenai2.error && (
+              <p style={{ color: 'red' }}>{langchainOpenai2.error.message}</p>
             )}
 
             <p className="py-4 break-all whitespace-pre-wrap">
