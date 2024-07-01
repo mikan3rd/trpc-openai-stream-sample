@@ -1,4 +1,6 @@
-# Prisma + tRPC
+# tRPC + OpenAI stream
+
+This repository is based on [examples-next-prisma-starter](https://github.com/trpc/examples-next-prisma-starter).
 
 ## Features
 
@@ -14,6 +16,12 @@
 
 ## Setup
 
+- Please set up your OpenAI API KEY
+  - <https://platform.openai.com/docs/quickstart/step-2-set-up-your-api-key>
+- Create an `.env` file, and write the environment variables.
+  - Please refer to the `.env.example` file.
+- If you do not have postgres installed on your local environment, you can use `docker compose up -d` to start postgres
+
 ```bash
 pnpm create next-app --example https://github.com/trpc/trpc --example-path examples/next-prisma-starter trpc-prisma-starter
 cd trpc-prisma-starter
@@ -24,7 +32,6 @@ pnpm dx
 ### Requirements
 
 - Node >= 18.0.0
-- Postgres
 
 ## Development
 
