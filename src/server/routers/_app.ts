@@ -4,22 +4,17 @@
 import { createCallerFactory, publicProcedure, router } from '../trpc';
 import { z } from 'zod';
 import { chatCompletionsStream } from '../functions/openai';
+import { iterablePromise } from '../functions/iterable';
 
 export const appRouter = router({
   examples: {
     // HTTP Batch Stream Link
     // https://trpc.io/docs/client/links/httpBatchStreamLink
     iterable: publicProcedure.query(async function* () {
-      for (let i = 0; i < 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        yield i;
-      }
+      yield* iterablePromise();
     }),
     iterable2: publicProcedure.mutation(async function* () {
-      for (let i = 0; i < 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        yield i;
-      }
+      yield* iterablePromise();
     }),
 
     openai: publicProcedure
