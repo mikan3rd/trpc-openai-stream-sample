@@ -1,6 +1,6 @@
 import { trpc } from '../utils/trpc';
 import type { NextPageWithLayout } from './_app';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 
 const IndexPage: NextPageWithLayout = () => {
@@ -170,7 +170,11 @@ const IndexPage: NextPageWithLayout = () => {
               <p style={{ color: 'red' }}>{openai2.error.message}</p>
             )}
 
-            <p className="py-4 break-all whitespace-pre-wrap">{openai.data}</p>
+            <p className="py-4 break-all whitespace-pre-wrap">
+              {openai.data?.map((chunk, index) => (
+                <Fragment key={index}>{chunk}</Fragment>
+              ))}
+            </p>
             <p className="py-4 break-all whitespace-pre-wrap">{text}</p>
 
             <hr />
@@ -205,7 +209,9 @@ const IndexPage: NextPageWithLayout = () => {
             )}
 
             <p className="py-4 break-all whitespace-pre-wrap">
-              {anthropic.data}
+              {anthropic.data?.map((chunk, index) => (
+                <Fragment key={index}>{chunk}</Fragment>
+              ))}
             </p>
             <p className="py-4 break-all whitespace-pre-wrap">
               {anthropicText}
@@ -243,7 +249,9 @@ const IndexPage: NextPageWithLayout = () => {
             )}
 
             <p className="py-4 break-all whitespace-pre-wrap">
-              {langchainOpenai.data}
+              {langchainOpenai.data?.map((chunk, index) => (
+                <Fragment key={index}>{chunk}</Fragment>
+              ))}
             </p>
             <p className="py-4 break-all whitespace-pre-wrap">
               {langchainOpenaiText}
@@ -285,7 +293,9 @@ const IndexPage: NextPageWithLayout = () => {
             )}
 
             <p className="py-4 break-all whitespace-pre-wrap">
-              {langchainAnthropic.data}
+              {langchainAnthropic.data?.map((chunk, index) => (
+                <Fragment key={index}>{chunk}</Fragment>
+              ))}
             </p>
             <p className="py-4 break-all whitespace-pre-wrap">
               {langchainAnthropicText}
